@@ -1,8 +1,16 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Landing from './pages/Landing'
+import CommandCenter from './pages/CommandCenter'
+
 function App() {
   return (
-    <div className="bg-red-500 text-white text-2xl p-8">
-      Mission Control India
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/control" element={<CommandCenter />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
