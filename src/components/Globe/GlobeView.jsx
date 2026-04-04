@@ -6,14 +6,21 @@ import * as THREE from 'three'
 // GlobeView renders just the Earth sphere + atmosphere
 // Satellite points and orbit lines are separate components
 function GlobeView({ isInteracting }) {
+  const isDay = new Date().getHours() >= 6 && new Date().getHours() < 18
+  const dayMode = true;
+
   const earthRef = useRef()
   const atmosphereRef = useRef()
 
   // TextureLoader loads image files as Three.js textures
   // useLoader caches the result — won't reload on re-render
-  const earthTexture = useLoader(
+  const dayTexture = useLoader(
     TextureLoader,
-    'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'
+    'src/assets/8k_earth_daymap.jpg'
+  )
+
+  const nightTexture = useLoader(
+    TextureLoader, "src/assets/8k_earth_nightmap.jpg"
   )
 
   const bumpTexture = useLoader(
@@ -42,11 +49,11 @@ function GlobeView({ isInteracting }) {
             64x64 is a good balance */}
         <sphereGeometry args={[1, 64, 64]} />
         <meshPhongMaterial
-          map={earthTexture}
+        map={isDay || dayMode ? dayTexture : nightTexture}
           bumpMap={bumpTexture}
-          bumpScale={0.05}
-          specular={new THREE.Color(0x333333)}
-          shininess={15}
+          bumpScale={1}
+          specular={new THREE.Color(0x666666)}
+          shininess={5}
         />
       </mesh>
 

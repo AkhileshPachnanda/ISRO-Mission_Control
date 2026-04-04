@@ -5,6 +5,8 @@ import GlobeView from './GlobeView'
 import SatelliteMarker from './SatelliteMarker'
 import GroundTrack from './GroundTrack'
 
+
+
 function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
   const [time, setTime] = useState(new Date())
   const [isInteracting, setIsInteracting] = useState(false)
@@ -16,8 +18,8 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
     return () => clearInterval(timer)
   }, [])
 
-  const utcTime = time.toISOString().split('T')[1].split('.')[0]
-  const utcDate = time.toISOString().split('T')[0]
+  const utcTime = time.toLocaleTimeString("en-IN")
+  const utcDate = time.toLocaleDateString("en-IN")
 
   return (
     <main style={{
@@ -145,7 +147,7 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
             opacity: 0.6,
             marginBottom: '0.25rem'
           }}>
-            MISSION TIME // UTC
+            MISSION TIME // IST
           </div>
           <div style={{
             fontFamily: 'JetBrains Mono',
