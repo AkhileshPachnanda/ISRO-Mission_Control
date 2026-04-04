@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useGLTF, Html } from "@react-three/drei";
 import * as THREE from "three";
-import { Html } from "@react-three/drei";
 
 // Converts lat/lng/altitude to 3D cartesian coordinates
 // This is the core math that places satellites on the globe
@@ -19,6 +19,7 @@ function latLngToVector3(lat, lng, radius) {
 function SatelliteMarker({ satellite, isSelected, onClick }) {
   const markerRef = useRef();
   const ringRef = useRef();
+  const { scene } = useGLTF("/assets/satellite.glb");
 
   const position = satellite.position;
   if (!position) return null;
@@ -49,11 +50,13 @@ function SatelliteMarker({ satellite, isSelected, onClick }) {
         onClick(satellite);
       }}
     >
-      {/* Diamond marker — rotated cube */}
-      <mesh ref={markerRef} rotation={[0, 0, Math.PI / 4]}>
-        <boxGeometry args={[0.012, 0.012, 0.012]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
+      {/* 3D Satellite Model */}
+      <primitive
+        ref={markerRef}
+        object={scene.clone()}
+        scale={[0.02, 0.02, 0.02]} // Scale down the model to fit
+        rotation={[-30, 5, 0]} // Adjust rotation if needed
+      />
 
       {/* Selection ring — only visible when selected */}
       {isSelected && (
