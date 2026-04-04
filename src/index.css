@@ -38,3 +38,14 @@ body {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+@theme {
+  --color-void:       #080808;
+  --color-surface:    #0F0F0F;
+  --color-border:     #1A1A1A;
+  --color-primary:    #FF3D00;
+  --color-secondary:  #00B4FF;
+  --color-tertiary:   #FF6B00;
+  --color-green:      #00FF85;
+  --color-amber:      #FFB300;
+}
