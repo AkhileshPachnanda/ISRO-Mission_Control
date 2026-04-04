@@ -1,8 +1,7 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
 
 :root {
-  /* Color tokens — single source of truth */
   --void:          #080808;
   --surface:       #0F0F0F;
   --border:        #1A1A1A;
@@ -33,4 +32,9 @@ html, body, #root {
 body {
   font-family: 'Space Grotesk', sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import GlobeView from './GlobeView'
 
 function GlobePanel({ selectedSatellite, onSelectSatellite }) {
   const [time, setTime] = useState(new Date())
@@ -145,14 +146,7 @@ function GlobePanel({ selectedSatellite, onSelectSatellite }) {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <p style={{
-          fontFamily: 'JetBrains Mono',
-          fontSize: '0.6rem',
-          letterSpacing: '0.15em',
-          color: 'var(--text-ghost)'
-        }}>
-          GLOBE INITIALIZING...
-        </p>
+       <GlobeView/>
       </div>
 
     </main>

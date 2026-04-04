@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
-import ReactGlobe from "react-globe.gl";
+import * as three from "three";
+import react from "react";
+import 
 
 function GlobeView({ onReady }) {
   const globeRef = useRef(null);
@@ -11,7 +12,7 @@ function GlobeView({ onReady }) {
     controls.autoRotate = true;
     controls.showAtmosphere = false;
     controls.autoRotateSpeed = 1;
-    controls.enableZoom = false;
+    controls.enableZoom = true;
     controls.enablePan = false;
 
     globeRef.current.pointOfView({ lat: 20, lng: 77, altitude: 2 }, 0);
