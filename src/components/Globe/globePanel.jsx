@@ -18,8 +18,8 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
     return () => clearInterval(timer)
   }, [])
 
-  const utcTime = time.toLocaleTimeString("en-IN")
-  const utcDate = time.toLocaleDateString("en-IN")
+  const istTime = time.toLocaleTimeString("en-IN")
+  const istDate = time.toLocaleDateString("en-IN")
 
   return (
     <main style={{
@@ -32,7 +32,7 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
       {/* Three.js Canvas — the WebGL viewport */}
       <Canvas
         camera={{
-          position: [0, 0, 2.8],
+          position: [0, 0, 3.5],
           fov: 45,
           near: 0.1,
           far: 1000
@@ -42,12 +42,12 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
         onPointerUp={() => setIsInteracting(false)}
       >
         {/* Ambient light — base illumination, no direction */}
-        <ambientLight intensity={0.3} />
+        <ambientLight intensity={0.2} />
 
         {/* Directional light — simulates the Sun */}
         <directionalLight
           position={[5, 3, 5]}
-          intensity={1.2}
+          intensity={2.5}
           color="#ffffff"
         />
 
@@ -56,8 +56,8 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
           radius={100}
           depth={50}
           count={5000}
-          factor={4}
-          saturation={0}
+          factor={7}
+          saturation={500}
           fade
         />
 
@@ -89,11 +89,11 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
           ref={controlsRef}
           enablePan={false}
           minDistance={1.5}
-          maxDistance={6}
-          rotateSpeed={0.5}
+          maxDistance={50}
+          rotateSpeed={0.2}
           zoomSpeed={0.8}
           autoRotate={!isInteracting && !selectedSatellite}
-          autoRotateSpeed={0.3}
+          autoRotateSpeed={0.2}
         />
       </Canvas>
 
@@ -155,7 +155,7 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
             color: 'var(--text-primary)',
             letterSpacing: '0.05em'
           }}>
-            {utcTime}
+            {istTime}
           </div>
           <div style={{
             fontFamily: 'JetBrains Mono',
@@ -164,7 +164,7 @@ function GlobePanel({ satellites = [], selectedSatellite, onSelectSatellite }) {
             letterSpacing: '0.1em',
             marginTop: '0.2rem'
           }}>
-            {utcDate}
+            {istDate}
           </div>
         </div>
 

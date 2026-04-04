@@ -9,11 +9,11 @@ function GroundTrack({ satellite }) {
   const points = useMemo(() => {
     if (!satellite?.tle) return []
 
-    const track = getGroundTrack(satellite.tle, 90, 2)
+    const track = getGroundTrack(satellite.tle, 350, 2)
     if (track.length < 2) return []
 
     return track.map(([lat, lng, alt]) =>
-      latLngToVector3(lat, lng, 1 + (alt || 0.08))
+      latLngToVector3(lat, lng, 1 + (alt || 0.05))
     )
   }, [satellite?.id])
 
@@ -21,15 +21,15 @@ function GroundTrack({ satellite }) {
 
   // Build a smooth curve through the points
   const curve = new CatmullRomCurve3(points)
-  const curvePoints = curve.getPoints(200)
+  const curvePoints = curve.getPoints(100)
   const geometry = new BufferGeometry().setFromPoints(curvePoints)
 
   return (
     <line geometry={geometry}>
       <lineBasicMaterial
-        color="#00B4FF"
+        color="#ff0011"
         transparent
-        opacity={0.35}
+        opacity={0.5}
       />
     </line>
   )

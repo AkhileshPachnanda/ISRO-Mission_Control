@@ -1,44 +1,51 @@
-import { useRef, useEffect } from 'react'
-import { useFrame, useLoader } from '@react-three/fiber'
-import { TextureLoader } from 'three'
-import * as THREE from 'three'
+import { useRef, useEffect } from "react";
+import { useFrame, useLoader } from "@react-three/fiber";
+import { TextureLoader } from "three";
+import * as THREE from "three";
 
 // GlobeView renders just the Earth sphere + atmosphere
 // Satellite points and orbit lines are separate components
 function GlobeView({ isInteracting }) {
-  const isDay = new Date().getHours() >= 6 && new Date().getHours() < 18
+  const isDay = new Date().getHours() >= 6 && new Date().getHours() < 18;
   const dayMode = true;
 
-  const earthRef = useRef()
-  const atmosphereRef = useRef()
+  const earthRef = useRef();
+  const atmosphereRef = useRef();
+  const cloudsRef = useRef();
 
   // TextureLoader loads image files as Three.js textures
   // useLoader caches the result — won't reload on re-render
-  const dayTexture = useLoader(
-    TextureLoader,
-    'src/assets/8k_earth_daymap.jpg'
-  )
+  const dayTexture = useLoader(TextureLoader, "src/assets/8k_earth_daymap.jpg");
 
   const nightTexture = useLoader(
-    TextureLoader, "src/assets/8k_earth_nightmap.jpg"
-  )
+    TextureLoader,
+    "src/assets/8k_earth_nightmap.jpg",
+  );
 
   const bumpTexture = useLoader(
     TextureLoader,
-    'https://unpkg.com/three-globe/example/img/earth-topology.png'
-  )
+    "src/assets/8081_earthbump4k.jpg",
+  );
+
+  const cloudTexture = useLoader(
+    TextureLoader,
+    "src/assets/8k_earth_clouds.jpg",
+  );
 
   // useFrame runs every animation frame — like requestAnimationFrame
   // delta is time since last frame in seconds
   // This is how you animate in R3F
   useFrame((state, delta) => {
-    if (!earthRef.current || isInteracting) return
+    if (!earthRef.current || isInteracting) return;
     // Slow auto-rotation when user isn't interacting
-    earthRef.current.rotation.y += delta * 0.05
+    earthRef.current.rotation.y += delta * 0.05;
     if (atmosphereRef.current) {
-      atmosphereRef.current.rotation.y += delta * 0.05
+      atmosphereRef.current.rotation.y += delta * 0.05;
     }
-  })
+    if (cloudsRef.current) {
+      cloudsRef.current.rotation.y += delta * 0.06; // Slightly faster for cloud movement
+    }
+  });
 
   return (
     <group>
@@ -49,37 +56,48 @@ function GlobeView({ isInteracting }) {
             64x64 is a good balance */}
         <sphereGeometry args={[1, 64, 64]} />
         <meshPhongMaterial
-        map={isDay || dayMode ? dayTexture : nightTexture}
-          bumpMap={bumpTexture}
-          bumpScale={1}
-          specular={new THREE.Color(0x666666)}
-          shininess={5}
+          map={isDay || dayMode ? dayTexture : nightTexture}
+          // bumpMap={bumpTexture}
+          // bumpScale={2}
+          // specular={new THREE.Color(0x666666)}
+          // shininess={5}
         />
       </mesh>
 
-      {/* Atmosphere — slightly larger transparent sphere */}
-      <mesh ref={atmosphereRef}>
-        <sphereGeometry args={[1.02, 64, 64]} />
+      {/* Cloud layer */}
+      {/* <mesh ref={cloudsRef}>
+        <sphereGeometry args={[1.01, 64, 64]} />
         <meshPhongMaterial
-          color={new THREE.Color(0x0044ff)}
+          map={cloudTexture}
           transparent
-          opacity={0.04}
+          opacity={0.6}
+          alphaMap={cloudTexture} // Use texture as alpha for transparency
+        />
+      </mesh> */}
+
+      {/* Atmosphere — slightly larger transparent sphere */}
+      {/* <mesh ref={atmosphereRef}>
+        <sphereGeometry args={[1.025, 64, 64]} />
+        <meshPhongMaterial
+          color={new THREE.Color(0x87ceeb)} // Sky blue for Rayleigh scattering
+          transparent
+          opacity={0.15}
           side={THREE.FrontSide}
         />
-      </mesh>
+      </mesh> */}
 
       {/* Outer glow ring */}
       <mesh>
-        <sphereGeometry args={[1.05, 64, 64]} />
+        <sphereGeometry args={[1.1, 64, 64]} />
         <meshPhongMaterial
-          color={new THREE.Color(0x00b4ff)}
+          color={new THREE.Color(0x4169e1)} // Royal blue for airglow
           transparent
-          opacity={0.015}
+          opacity={0.03}
           side={THREE.BackSide}
         />
       </mesh>
     </group>
-  )
+  );
 }
 
-export default GlobeView
+export default GlobeView;
