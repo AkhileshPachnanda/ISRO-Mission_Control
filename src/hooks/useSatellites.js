@@ -1,50 +1,78 @@
 import { useState, useEffect, useRef } from 'react'
-import { SATELLITES } from '../data/satellites'
+import { fetchAllTLEs } from '../lib/celestrak'
 import { getCurrentPosition } from '../lib/propogator'
 
+console.log('useSatellites module loaded')
+
 export function useSatellites() {
-  // enrichedSatellites = static metadata + live position combined
   const [satellites, setSatellites] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const satellitesRef = useRef([])
   const intervalRef = useRef(null)
 
-  // Compute positions for all satellites right now
-  function computePositions() {
-    const enriched = SATELLITES.map(sat => {
+  // Compute and update live positions
+  function computePositions(satsWithTLE) {
+    const enriched = satsWithTLE.map(sat => {
+      if (!sat.tle) return { ...sat, position: null }
+
       const position = getCurrentPosition(sat.tle)
-
-      // If propagation fails, fall back to null position
-      // The UI will handle this gracefully
-      if (!position) {
-        return { ...sat, position: null }
-      }
-
-      return {
-        ...sat,
-        position: {
-          lat: position.lat,
-          lng: position.lng,
-          alt: position.alt,
-          velocity: position.velocity
-        }
-      }
+      return { ...sat, position: position || null }
     })
 
+    satellitesRef.current = enriched
     setSatellites(enriched)
-    setLoading(false)
   }
 
   useEffect(() => {
-    // Compute immediately on mount
-    computePositions()
+    console.log('useEffect running')
+    async function init() {
+      try {
+        setLoading(true)
+        setError(null)
 
-    // Then recompute every 5 seconds
-    // Satellites move ~35km every 5 seconds in LEO
-    // Fast enough to look live, slow enough to not hammer the CPU
-    intervalRef.current = setInterval(computePositions, 5000)
+        // Step 1 — fetch live TLEs from CelesTrak
+        console.log('Fetching TLE data from CelesTrak...')
+        const satsWithTLE = await fetchAllTLEs()
+        console.log(`TLE data received for ${satsWithTLE.filter(s => s.tle).length}/${satsWithTLE.length} satellites`)
 
-    return () => clearInterval(intervalRef.current)
+        // Step 2 — compute initial positions immediately
+        computePositions(satsWithTLE)
+        setLoading(false)
+
+        // Step 3 — recompute positions every 5 seconds
+        // TLE data itself is re-fetched every 6 hours (below)
+        intervalRef.current = setInterval(() => {
+          computePositions(satellitesRef.current)
+        }, 5000)
+
+      } catch (err) {
+        console.error('Failed to initialize satellites:', err)
+        setError(err.message)
+        setLoading(false)
+      }
+    }
+
+    init()
+
+    // Re-fetch fresh TLEs from CelesTrak every 6 hours
+    // TLE data drifts in accuracy over time — fresh data = better positions
+    const tleRefreshInterval = setInterval(async () => {
+      try {
+        console.log('Refreshing TLE data...')
+        const satsWithTLE = await fetchAllTLEs()
+        satellitesRef.current = satsWithTLE
+        computePositions(satsWithTLE)
+      } catch (err) {
+        console.warn('TLE refresh failed, using existing data:', err)
+      }
+    }, 6 * 60 * 60 * 1000) // 6 hours in ms
+
+    return () => {
+      clearInterval(intervalRef.current)
+      clearInterval(tleRefreshInterval)
+    }
   }, [])
 
-  return { satellites, loading }
+  return { satellites, loading, error }
 }
