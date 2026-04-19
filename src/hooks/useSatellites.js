@@ -44,7 +44,7 @@ export function useSatellites() {
         // TLE data itself is re-fetched every 6 hours (below)
         intervalRef.current = setInterval(() => {
           computePositions(satellitesRef.current)
-        }, 5000)
+        }, 100)
 
       } catch (err) {
         console.error('Failed to initialize satellites:', err)
